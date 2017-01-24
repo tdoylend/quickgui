@@ -12,19 +12,23 @@ class Window(SingleChildObj):
 
         self.surface = None
 
-        self.text_focus = None
-
     def handle_motion(self,position):
         if self.child:
-            self.child.handle_motion(position,)
+            self.child.handle_motion(position,self.surface.get_rect())
 
-    def set_text_focus(self,obj):
-        self.text_focus = obj
+    def handle_click(self,position,button):
+        if self.child:
+            self.child.handle_click(position,self.surface.get_rect(),button)
 
     def construct(self):
         pygame.display.init()
-        self.surface = pygame.display.set_mode(self.size,pygame.FULLSCREEN&self.fullscreen)
+        self.surface = pygame.display.set_mode(self.size,(pygame.FULLSCREEN&self.fullscreen)|pygame.RESIZABLE)
         pygame.display.set_caption(self.title)
+
+    def redimension(self,size):
+        self.size = size
+        self.width,self.height = self.size
+        self.surface = pygame.display.set_mode(self.size,(pygame.FULLSCREEN&self.fullscreen)|pygame.RESIZABLE)
 
     def deconstruct(self):
         pygame.display.quit()
@@ -33,3 +37,11 @@ class Window(SingleChildObj):
     def draw(self):
         if self.child:
             self.child.draw(self.surface,self.surface.get_rect())
+
+    def handle_text(self,text):
+        if self.application.text_focus:
+            self.application.text_focus.handle_text(text)
+    
+    def handle_key(self,key):
+        if self.application.text_focus:
+            self.application.text_focus.handle_key(key)

@@ -6,6 +6,9 @@ class Theme:
     def __init__(self,**kwargs):
         self.__dict__ = kwargs
 
+    def __getitem__(self,item):
+        return self.__dict__[item]
+
 class TwoColorThematics:
     def __init__(self,bg_color,fg_color):
         self.set_bg(bg_color)
@@ -27,3 +30,16 @@ class TwoColorThematics:
         self.fg_raw = compute_raw_color(self.application,self.fg)
 
     #NOTE: Always call rebuild_colors in connect_application
+
+default_theme = Theme(
+    default_bg = (240,240,240),
+    default_fg = (0,0,0),
+
+    default_button_bg = (160,160,160),
+    default_button_fg = (0,0,0),
+    default_button_border = (0,0,0),
+
+    default_button_hi_bg = (96,96,96),
+    default_button_hi_fg = (240,240,240),
+    default_button_hi_border = (0,0,0),
+)

@@ -8,6 +8,6 @@ def compute_raw_color(application,color):
     elif isinstance(color,str):
         if not application.theme:
             raise ValueError('Widget demands color theme but application non-themed')
-        return pygame.Color(application.theme[color])
+        return pygame.Color(*application.theme[color])
     else:
         raise TypeError('Unsupported color declaration')

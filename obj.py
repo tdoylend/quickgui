@@ -25,13 +25,19 @@ class Obj:
     def connect_application(self,application):
         self.application = application
 
-    def handle_motion(self,position,button,rect):
+    def handle_motion(self,position,rect):
         pass
 
-    def handle_click(self,position,button,rect):
+    def handle_leave(self):
+        pass
+
+    def handle_click(self,position,rect,button):
         pass
 
     def handle_text(self,text):
+        pass
+
+    def handle_key(self,key):
         pass
 
 class SingleChildObj(Obj):
@@ -66,6 +72,31 @@ class BorderPanel(SingleChildObj,TwoColorThematics):
         SingleChildObj.connect_application(self,application)
         self.rebuild_colors()
 
+    def handle_motion(self,position,rect):
+        if self.child:
+            if self.derivative_rect(rect).collidepoint(position):
+                self.child.handle_motion(position,self.derivative_rect(rect))
+            else:
+                self.child.handle_leave()
+
+    def handle_click(self,position,rect,button):
+        if self.child:
+            if self.derivative_rect(rect).collidepoint(position):
+                self.child.handle_click(position,self.derivative_rect(rect),button)
+            else:
+                self.child.handle_leave()
+    
+    def handle_leave(self):
+        if self.child: self.child.handle_leave()    
+
+    def derivative_rect(self,rect):
+        return pygame.Rect(
+            rect.left+self.total_padding,
+            rect.top+self.total_padding,
+            rect.width-self.total_padding*2,
+            rect.height-self.total_padding*2
+        )
+
 
     def suggest_min_metrics(self):
         return pygame.Rect(0,0,self.total_padding*2,self.total_padding*2)
@@ -74,46 +105,41 @@ class BorderPanel(SingleChildObj,TwoColorThematics):
         pygame.draw.rect(surface,self.bg_raw,rect)
 
         #margin = self.padding / 2
+        if self.border:
+            pygame.draw.line(
+                surface,
+                self.fg_raw,
+                (rect.left+self.out_padding-1,rect.top+self.out_padding-1),
+                (rect.right-self.out_padding,rect.top+self.out_padding-1),
+                self.border
+            )
 
-        pygame.draw.line(
-            surface,
-            self.fg_raw,
-            (rect.left+self.out_padding-1,rect.top+self.out_padding-1),
-            (rect.right-self.out_padding,rect.top+self.out_padding-1),
-            self.border
-        )
+            pygame.draw.line(
+                surface,
+                self.fg_raw,
+                (rect.right-self.out_padding,rect.bottom-self.out_padding),
+                (rect.left+self.out_padding,rect.bottom-self.out_padding),
+                self.border
+            )
 
-        pygame.draw.line(
-            surface,
-            self.fg_raw,
-            (rect.right-self.out_padding,rect.bottom-self.out_padding),
-            (rect.left+self.out_padding,rect.bottom-self.out_padding),
-            self.border
-        )
+            pygame.draw.line(
+                surface,
+                self.fg_raw,
+                (rect.right-self.out_padding,rect.bottom-self.out_padding),
+                (rect.right-self.out_padding,rect.top+self.out_padding),
+                self.border
+            )
 
-        pygame.draw.line(
-            surface,
-            self.fg_raw,
-            (rect.right-self.out_padding,rect.bottom-self.out_padding),
-            (rect.right-self.out_padding,rect.top+self.out_padding),
-            self.border
-        )
-
-        pygame.draw.line(
-            surface,
-            self.fg_raw,
-            (rect.left+self.out_padding-1,rect.top+self.out_padding),
-            (rect.left+self.out_padding-1,rect.bottom-self.out_padding),
-            self.border
-        )
+            pygame.draw.line(
+                surface,
+                self.fg_raw,
+                (rect.left+self.out_padding-1,rect.top+self.out_padding),
+                (rect.left+self.out_padding-1,rect.bottom-self.out_padding),
+                self.border
+            )
 
         if self.child:
             self.child.draw(
                 surface,
-                pygame.Rect(
-                    rect.left+self.total_padding,
-                    rect.top+self.total_padding,
-                    rect.width-self.total_padding*2,
-                    rect.height-self.total_padding*2
-                )
+                self.derivative_rect(rect)
             )
