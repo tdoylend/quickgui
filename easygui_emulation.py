@@ -2,9 +2,10 @@ from .app import Application
 from .text import SimpleText,MultilineText
 from .button import Button
 from .window import Window
-from .splitter import ProportionalVerticalSplitter
+from .splitter import ProportionalVerticalSplitter,RemainingSpaceVerticalSplitter, ProportionalHorizontalSplitter
 from .entry import TextEntry
 from .obj import BorderPanel
+from .choice import ListBox
 
 DEFAULT_FONT = 'Helvetica,Arial'
 
@@ -75,3 +76,55 @@ def enterbox(msg='Enter something.', title=' ', default='',strip=True):
     else:
         return None
 
+def choicebox(msg='Pick something.',title=' ',choices=()):
+    messagebox_provider = MultilineText if '\n' in msg else SimpleText
+    message = messagebox_provider(msg,DEFAULT_FONT,DEFAULT_FONT_SIZE)
+    message_min = message.suggest_min_metrics()
+
+    message_panel = BorderPanel()
+    message_panel.add_child(message)
+
+    window = Window(title,(320,240))
+    application=Application(window)
+
+    options_box = ListBox(choices,'',DEFAULT_FONT,DEFAULT_FONT_SIZE)
+
+    
+
+    inside_splitter = RemainingSpaceVerticalSplitter(False,10)
+    outside_splitter = RemainingSpaceVerticalSplitter(True)
+
+    inside_splitter.add_child_top(message_panel)
+    inside_splitter.add_child_bottom(options_box)
+
+    outside_splitter.add_child_top(inside_splitter)
+
+    select = Button('Select',lambda *args: (application.suggest_quit(return_value=True)) if options_box.selection is not None else None,DEFAULT_FONT,DEFAULT_FONT_SIZE)
+    cancel = Button('Cancel',lambda *args: application.suggest_quit(),DEFAULT_FONT,DEFAULT_FONT_SIZE)
+
+    button_splitter = ProportionalHorizontalSplitter(0.5)
+
+    button_splitter.add_child_left(cancel)
+    button_splitter.add_child_right(select)
+
+    outside_splitter.add_child_bottom(button_splitter)
+
+    window.add_child(outside_splitter)
+
+    final_window_x = 640 #TODO: Fix this awful hack
+    final_window_y = (select.suggest_min_metrics().height)*3 + options_box.suggest_min_metrics().height
+
+    window.fix((final_window_x,final_window_y))
+
+    application.set_text_focus(options_box)
+
+    options_box.set_handler(lambda *args: application.suggest_quit(return_value=True))
+
+
+    if application.run():
+        if options_box.selection is not None:
+            return choices[options_box.selection]
+        else:
+            return None
+    else:
+        return None

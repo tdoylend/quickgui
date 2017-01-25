@@ -5,12 +5,15 @@ from .obj import SingleChildObj
 class Window(SingleChildObj):
     def __init__(self,title,size,fullscreen=False):
         SingleChildObj.__init__(self)
-        self.size = size
-        self.width,self.height = self.size
+        self.fix(size)
         self.fullscreen = fullscreen
         self.title = title
 
         self.surface = None
+
+    def fix(self,size):
+        self.size = size
+        self.width,self.height = self.size
 
     def handle_motion(self,position):
         if self.child:

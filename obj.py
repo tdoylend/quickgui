@@ -99,7 +99,11 @@ class BorderPanel(SingleChildObj,TwoColorThematics):
 
 
     def suggest_min_metrics(self):
-        return pygame.Rect(0,0,self.total_padding*2,self.total_padding*2)
+        if self.child:
+            m = self.child.suggest_min_metrics()
+            return pygame.Rect(0,0,m.width+self.total_padding*2,m.height+self.total_padding*2)
+        else:
+            return pygame.Rect(0,0,self.total_padding*2,self.total_padding*2)
 
     def draw(self,surface,rect):
         pygame.draw.rect(surface,self.bg_raw,rect)
