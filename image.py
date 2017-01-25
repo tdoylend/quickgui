@@ -10,4 +10,9 @@ class Image(Obj):
         return self.image.get_rect()
     
     def draw(self,surface,rect):
-        pass
+        r = self.image.get_rect()
+
+        blit_x = surface.centerx - r.centerx
+        blit_y = surface.centery - r.centery
+
+        surface.blit(self.image,(blit_x,blit_y))

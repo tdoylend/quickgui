@@ -28,6 +28,7 @@ import text
 import window
 import button
 import relation
+import image
 
 from easygui_emulation import * #Comment out this line if you're building custom GUIs.
 
