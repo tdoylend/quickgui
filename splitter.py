@@ -222,3 +222,27 @@ class RemainingSpaceVerticalSplitter(Obj):
             self.child_top.connect_application(application)
         if self.child_bottom:
             self.child_bottom.connect_application(application)
+
+class EqualHorizontalSplitter(Obj):
+    def __init__(self):
+        Obj.__init__(self)
+
+        self.children = []
+
+    def add_child(self,child):
+        self.children.append(child)
+
+    def pop_child(self):
+        return self.children.pop()
+
+    def draw(self,surface,rect):
+        for index in xrange(len(self.children)):
+            child = self.children[index]
+            position_x = int(index/float(len(self.children)))
+            child.draw(surface,position_x)
+
+    def handle_leave(self):
+        for child in self.children:
+            child.handle_leave()
+
+        
